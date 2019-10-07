@@ -23,7 +23,7 @@
     $beschreibung = $_POST["beschreibung"];
 	$link = $_POST["link"];
 	#captcha
-	$secretKey = "6Ld4cnsUAAAAAFr6Mio94BBM8oeUTIrmgVaE5zpY";
+	$secretKey = "key";
 	$responseKey = $_POST["g-recaptcha-response"];
 	$userIP = $_SERVER["REMOTE-ADDR"];
 	$url = "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$responseKey&remoteip=$userIP";

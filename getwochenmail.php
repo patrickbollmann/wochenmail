@@ -14,8 +14,8 @@
         die("Verbindung fehlgeschlagen: " . $mysqli->connect_error);
     }
 
-    $von = $_POST["von"];
-    $bis = $_POST["bis"];
+    $von = mysqli_real_escape_string($mysqli, $_POST['von']);
+    $bis = mysqli_real_escape_string($mysqli, $_POST['bis']);
 
         $sql = "SELECT * FROM event WHERE date >= '$von' AND date <= '$bis' ORDER BY date ASC, time ASC";
         $result = $mysqli->query($sql);

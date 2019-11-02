@@ -20,6 +20,7 @@ conn = pymysql.connect(host="db.danielki.de",user="user",
 										charset="utf8")
 cur = conn.cursor()
 
+#upb.de/veranstaltungen
 r = requests.get('https://upb.de/veranstaltungen')
 r.headers['content-type']
 content =r.text
@@ -44,6 +45,43 @@ for e in event:
 
         time = datetime.strptime(time,"%H.%M").strftime("%H:%M")
         date = datetime.strptime(date,"%d.%m.%Y").strftime("%Y-%m-%d")
+        row=[date, time, title, teaser, link, location, "27"]
+        try:
+            cur.execute("INSERT INTO `event` (`date`, `time`, `name`, `description`, `link`, `location`, `person_id`) VALUES ("+",".join(list(map(lambda x:"\""+x+"\"",row)))+ ");")
+            conn.commit()
+            print("Termin: "+title+" Eingetragen")
+        except pymysql.IntegrityError as e:
+            print(e)
+    except(IndexError):
+        pass
+
+#math.upb.de
+r = requests.get('https://math.uni-paderborn.de')
+r.headers['content-type']
+content =r.text
+event = content.split("<!-- THIS SECTION IS A SINGLE EVENT -->")
+event.pop(0)
+for e in event:
+    try:
+        w = e.split("<div class=\"date\">")
+        x = w[1].split(", ")
+        d = x[1].split("| ")
+        date = d[0].strip()
+        t = d[1].split("</div>")
+        time = t[0].split(" ")[0].strip()
+        l = e.split("<a href=\"")
+        li = l[1].split("/\">")
+        link = "https://math.uni-paderborn.de/"+li[0].strip()
+        ti = li[1].split("</a>")
+        title = ti[0].strip()
+        te = e.split("<div class=\"teaser\">")
+        te1 = te[1].split("<span><p>")[1]
+        teaser = te1.split("</p>")[0].strip().replace("<em>","").replace("</em>","").replace("&nbsp;","")
+        location = getloc(link)
+
+        time = datetime.strptime(time,"%H.%M").strftime("%H:%M")
+        date = datetime.strptime(date,"%d.%m.%Y").strftime("%Y-%m-%d")
+        
         row=[date, time, title, teaser, link, location, "27"]
         try:
             cur.execute("INSERT INTO `event` (`date`, `time`, `name`, `description`, `link`, `location`, `person_id`) VALUES ("+",".join(list(map(lambda x:"\""+x+"\"",row)))+ ");")
